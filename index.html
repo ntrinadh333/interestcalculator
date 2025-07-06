@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Interest Calculator</title>
   <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: Arial, sans-serif;
       background-color: #ffffff;
@@ -30,6 +34,7 @@
       border-radius: 5px;
       border: 1px solid #ccc;
       font-size: 14px;
+      box-sizing: border-box;
     }
 
     .interest-options {
@@ -111,10 +116,10 @@
   <div id="mainForm">
     <div class="interest-options">
       <input type="radio" id="simple" name="interestType" value="simple" checked>
-      <label for="simple" id="simpleLabel">Simple</label>
+      <label for="simple" id="simpleLabel">Simple Interest</label>
 
       <input type="radio" id="compound" name="interestType" value="compound">
-      <label for="compound" id="compoundLabel">Compound</label>
+      <label for="compound" id="compoundLabel">Compound Interest</label>
     </div>
 
     <input type="number" id="amount" placeholder="Amount (₹)">
@@ -133,7 +138,7 @@
 
 <script>
   const translations = {
-    en: { title: "Interest Calculator", simple: "Simple", compound: "Compound", button: "Calculate", error: "Fill all fields correctly.", dateError: "End date must be after start." },
+    en: { title: "Interest Calculator", simple: "Simple Interest", compound: "Compound Interest", button: "Calculate", error: "Fill all fields correctly.", dateError: "End date must be after start." },
     te: { title: "వడ్డీ లెక్కింపు", simple: "సాదా", compound: "సంక్లిష్ట", button: "లెక్కించు", error: "సరైన వివరాలు ఇవ్వండి.", dateError: "ముగింపు తేదీ తప్పనిసరిగా తరువాత ఉండాలి." },
     hi: { title: "ब्याज कैलकुलेटर", simple: "साधारण", compound: "चक्रवृद्धि", button: "गणना करें", error: "सभी फ़ील्ड सही भरें।", dateError: "समाप्ति तिथि प्रारंभ तिथि के बाद होनी चाहिए।" }
   };
