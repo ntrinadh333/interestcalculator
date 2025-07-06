@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Interest Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .calculator {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      background-color: #fefefe;
+    }
+
+    select, input[type="number"], input[type="date"], button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      margin-bottom: 12px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    .interest-options {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
+
+    .interest-options label {
+      flex: 1;
+      text-align: center;
+      padding: 10px;
+      border-radius: 5px;
+      background: #f0f0f0;
+      cursor: pointer;
+      margin: 0 2px;
+    }
+
+    .interest-options input[type="radio"] {
+      display: none;
+    }
+
+    .interest-options input[type="radio"]:checked + label {
+      background: #007BFF;
+      color: white;
+    }
+
+    button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .result {
+      margin-top: 10px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      display: none;
+    }
+
+    table th, table td {
+      border: 1px solid #ccc;
+      padding: 5px;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    #backButton {
+      display: none;
+      background: #6c757d;
+      margin-top: 10px;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="calculator">
+  <select id="language" onchange="setLanguage()">
+    <option value="en">English</option>
+    <option value="te">తెలుగు</option>
+    <option value="hi">हिन्दी</option>
+  </select>
+
+  <h3 id="title">Interest Calculator</h3>
+
+  <div id="mainForm">
+    <div class="interest-options">
+      <input type="radio" id="simple" name="interestType" value="simple" checked>
+      <label for="simple" id="simpleLabel">Simple</label>
+
+      <input type="radio" id="compound" name="interestType" value="compound">
+      <label for="compound" id="compoundLabel">Compound</label>
+    </div>
+
+    <input type="number" id="amount" placeholder="Amount (₹)">
+    <input type="number" id="rate" placeholder="Interest Rate (% per annum)">
+    <input type="date" id="fromDate">
+    <input type="date" id="toDate">
+
+    <button onclick="calculateInterest()" id="calcButton">Calculate</button>
+    <div class="result" id="result"></div>
+    <button onclick="showDetails()" id="detailsButton" style="display:none;">View in Detail</button>
+  </div>
+
+  <table id="detailsTable"></table>
+  <button onclick="goBack()" id="backButton">Back</button>
+</div>
+
+<script>
+  const translations = {
+    en: { title: "Interest Calculator", simple: "Simple", compound: "Compound", button: "Calculate", error: "Fill all fields correctly.", dateError: "End date must be after start." },
+    te: { title: "వడ్డీ లెక్కింపు", simple: "సాదా", compound: "సంక్లిష్ట", button: "లెక్కించు", error: "సరైన వివరాలు ఇవ్వండి.", dateError: "ముగింపు తేదీ తప్పనిసరిగా తరువాత ఉండాలి." },
+    hi: { title: "ब्याज कैलकुलेटर", simple: "साधारण", compound: "चक्रवृद्धि", button: "गणना करें", error: "सभी फ़ील्ड सही भरें।", dateError: "समाप्ति तिथि प्रारंभ तिथि के बाद होनी चाहिए।" }
+  };
+
+  let globalData = {};
+
+  function setLanguage() {
+    const lang = document.getElementById('language').value;
+    const t = translations[lang];
+    document.getElementById('title').innerText = t.title;
+    document.getElementById('simpleLabel').innerText = t.simple;
+    document.getElementById('compoundLabel').innerText = t.compound;
+    document.getElementById('calcButton').innerText = t.button;
+  }
+
+  function calculateInterest() {
+    const amount = parseFloat(document.getElementById('amount').value);
+    const rate = parseFloat(document.getElementById('rate').value);
+    const fromDate = new Date(document.getElementById('fromDate').value);
+    const toDate = new Date(document.getElementById('toDate').value);
+    const lang = document.getElementById('language').value;
+    const t = translations[lang];
+
+    const interestType = document.querySelector('input[name="interestType"]:checked').value;
+
+    if (isNaN(amount) || isNaN(rate) || isNaN(fromDate.getTime()) || isNaN(toDate.getTime()) || toDate <= fromDate) {
+      document.getElementById('result').innerText = toDate <= fromDate ? t.dateError : t.error;
+      document.getElementById('detailsButton').style.display = 'none';
+      return;
+    }
+
+    const days = Math.ceil((toDate - fromDate) / (1000 * 3600 * 24));
+    const years = days / 365;
+    let interest = interestType === 'simple' ? (amount * rate * days) / (100 * 365) : amount * (Math.pow(1 + rate / 100, years) - 1);
+    const total = amount + interest;
+
+    document.getElementById('result').innerHTML = `${t[interestType]}: ₹${interest.toFixed(2)}<br>Total: ₹${total.toFixed(2)}`;
+    document.getElementById('detailsButton').style.display = 'block';
+
+    globalData = { amount, rate, fromDate, toDate, interestType };
+  }
+
+  function showDetails() {
+    const { amount, rate, fromDate, toDate, interestType } = globalData;
+    if (!amount) return;
+
+    let table = '<tr><th>Month</th><th>Interest</th><th>Total</th></tr>';
+    let currentAmount = amount;
+    let currentDate = new Date(fromDate);
+    let monthIndex = 1;
+
+    while (currentDate <= toDate) {
+      const nextMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, currentDate.getDate());
+      const end = nextMonth < toDate ? nextMonth : toDate;
+      const daysInPeriod = Math.ceil((end - currentDate) / (1000 * 3600 * 24));
+
+      let interest = interestType === 'simple' ? (amount * rate * daysInPeriod) / (100 * 365) : currentAmount * (Math.pow(1 + rate / 100, daysInPeriod / 365) - 1);
+      if (interestType === 'compound') currentAmount += interest;
+
+      const total = interestType === 'simple' ? amount + (amount * rate * ((currentDate - fromDate) / (1000 * 3600 * 24) + daysInPeriod) / (100 * 365)) : currentAmount;
+      table += `<tr><td>Month ${monthIndex}</td><td>₹${interest.toFixed(2)}</td><td>₹${total.toFixed(2)}</td></tr>`;
+
+      currentDate = new Date(end);
+      currentDate.setDate(currentDate.getDate() + 1);
+      monthIndex++;
+    }
+
+    document.getElementById('mainForm').style.display = 'none';
+    document.getElementById('detailsTable').innerHTML = table;
+    document.getElementById('detailsTable').style.display = 'table';
+    document.getElementById('backButton').style.display = 'block';
+  }
+
+  function goBack() {
+    document.getElementById('mainForm').style.display = 'block';
+    document.getElementById('detailsTable').style.display = 'none';
+    document.getElementById('backButton').style.display = 'none';
+  }
+</script>
+
+</body>
+</html>
